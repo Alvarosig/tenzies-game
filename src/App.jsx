@@ -9,10 +9,10 @@ function App() {
   const [dice, setDice] = useState(allNewDice())
   const [tenzies, setTenzies] = useState(false)
   const [diceHistory, setDiceHistory] = useState(0);
-  const [minRolls, setMinRolls] = useState(Infinity);
-  const [maxRolls, setMaxRolls] = useState(0);
   const [time, setTime] = useState(0);
-  const [bestTime, setBestTime] = useState(Infinity);
+  const [minRolls, setMinRolls] = useState(() => Number(localStorage.getItem('minRolls')) || Infinity);
+  const [maxRolls, setMaxRolls] = useState(() => Number(localStorage.getItem('maxRolls')) || 0);
+  const [bestTime, setBestTime] = useState(() => Number(localStorage.getItem('bestTime')) || Infinity);
 
   useEffect(() => {
     const allHeld = dice.every(die => die.isHeld)
@@ -71,10 +71,20 @@ function App() {
         }))
         setDiceHistory(prevHistory => prevHistory + 1);
       } else {
-        setMinRolls(min => Math.min(min, diceHistory));
-        setMaxRolls(max => Math.max(max, diceHistory));
-        setBestTime(best => { const newBest = Math.min(best, time);
-          return newBest;
+        setMinRolls(min => {
+          const newMin = Math.min(min, diceHistory);
+          localStorage.setItem('minRolls', newMin); // Salva no localStorage
+          return newMin;
+        });
+        setMaxRolls(max => {
+            const newMax = Math.max(max, diceHistory);
+            localStorage.setItem('maxRolls', newMax); // Salva no localStorage
+            return newMax;
+        });
+        setBestTime(best => { 
+            const newBest = Math.min(best, time);
+            localStorage.setItem('bestTime', newBest); // Salva no localStorage
+            return newBest;
         });
         setTenzies(false)
         setDice(allNewDice())
