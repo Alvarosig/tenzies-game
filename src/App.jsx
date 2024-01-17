@@ -9,6 +9,8 @@ function App() {
   const [dice, setDice] = useState(allNewDice())
   const [tenzies, setTenzies] = useState(false)
   const [diceHistory, setDiceHistory] = useState(0);
+  const [minRolls, setMinRolls] = useState(Infinity);
+  const [maxRolls, setMaxRolls] = useState(0);
 
   useEffect(() => {
     const allHeld = dice.every(die => die.isHeld)
@@ -52,7 +54,9 @@ function App() {
                 generateNewDie()
         }))
         setDiceHistory(prevHistory => prevHistory + 1);
-    } else {
+      } else {
+        setMinRolls(min => Math.min(min, diceHistory));
+        setMaxRolls(max => Math.max(max, diceHistory));
         setTenzies(false)
         setDice(allNewDice())
         setDiceHistory(0)
@@ -92,9 +96,11 @@ function App() {
           >
               {tenzies ? "New Game" : "Roll"}
           </button>
-          {`Number of rolls: ${diceHistory}`}
-          {`Number max of rolls:`}
-          {`Number min of rolls:`}
+          <div className="stats">
+              <p>Number of rolls: {diceHistory}</p>
+              <p>Number max of rolls: {maxRolls === 0 ? 'N/A': maxRolls}</p>
+              <p>Number min of rolls: {minRolls === Infinity ? 'N/A' : minRolls}</p>
+          </div>
       </main>
     </div>
   )
