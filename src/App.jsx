@@ -11,6 +11,8 @@ function App() {
   const [diceHistory, setDiceHistory] = useState(0);
   const [minRolls, setMinRolls] = useState(Infinity);
   const [maxRolls, setMaxRolls] = useState(0);
+  const [time, setTime] = useState(0);
+  const [bestTime, setBestTime] = useState(Infinity);
 
   useEffect(() => {
     const allHeld = dice.every(die => die.isHeld)
@@ -20,6 +22,20 @@ function App() {
         setTenzies(true)
     }
   }, [dice])
+
+  useEffect(() => {
+    let timer;
+    const isAnyDieHeld = dice.some( die => die.isHeld);
+    if (isAnyDieHeld && !tenzies) {
+        timer = setInterval(() => {
+            setTime(prevTime => prevTime + 1);
+        }, 1000);
+    } else {
+        clearInterval(timer);
+    }
+    return () => clearInterval(timer);
+  }, [tenzies, dice]);
+
 
   function generateNewDie() {
     const diceFaces = [
@@ -57,9 +73,13 @@ function App() {
       } else {
         setMinRolls(min => Math.min(min, diceHistory));
         setMaxRolls(max => Math.max(max, diceHistory));
+        setBestTime(best => { const newBest = Math.min(best, time);
+          return newBest;
+        });
         setTenzies(false)
         setDice(allNewDice())
         setDiceHistory(0)
+        setTime(0);
     }
   }
 
@@ -98,8 +118,10 @@ function App() {
           </button>
           <div className="stats">
               <p>Number of rolls: {diceHistory}</p>
+              <p>Best Time: {bestTime === Infinity ? 'N/A' : `${bestTime} seconds`}</p>
               <p>Number max of rolls: {maxRolls === 0 ? 'N/A': maxRolls}</p>
               <p>Number min of rolls: {minRolls === Infinity ? 'N/A' : minRolls}</p>
+              <p>Timer: {time} seconds</p>
           </div>
       </main>
     </div>
